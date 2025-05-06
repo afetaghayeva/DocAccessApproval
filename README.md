@@ -57,6 +57,36 @@ This project uses a layered architecture with Domain-Driven Design (DDD) princip
 
 ---
 
+## Unit Test Scenarios
+
+The project includes unit tests focused on verifying application-level logic in isolation using mocks.
+
+### CreateAccessRequestCommandHandlerTests
+
+#### Scenario: Successfully Add Access Request
+
+- Simulates a user requesting access (e.g., Read + Edit) to a document.
+- Mocks repository and mapper using Moq.
+- Verifies:
+  - The document is retrieved from the repository.
+  - The `AccessRequest` is added to the aggregate root.
+  - The request is persisted via `UnitOfWork`.
+  - A valid `AccessRequestDto` is returned by the handler.
+
+### MakeDecisionCommandHandlerTests
+
+#### Scenario: Approver Makes a Decision
+
+- Simulates an approver making an **approve or reject** decision on a pending request.
+- Verifies:
+  - The relevant document and request are fetched.
+  - The decision is applied correctly (status and comments).
+  - Changes are saved to the database.
+  - A `DecisionDto` is returned.
+  - A domain event (`MadeDecisionEvent`) is triggered.
+
+---
+
 ##  How to Run the Project
 
 1. **Clone the repo**  
@@ -75,7 +105,6 @@ This project uses a layered architecture with Domain-Driven Design (DDD) princip
 4. **Run the tests**
    ```bash
    dotnet test
-
 
 ## Future Improvements (If More Time Available)
   1. Add Refresh Token support for authentication.
