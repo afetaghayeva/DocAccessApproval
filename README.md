@@ -17,8 +17,14 @@ This project uses a layered architecture with Domain-Driven Design (DDD) princip
 - **Infrastructure Layer**   
   Contains database implementations, context, entity configurations (SQLite and EF Core).
 
+- **API Layer** 
+  Hosts the RESTful endpoints for interacting with the system.
+  - Integrated with **Swagger UI** for API exploration and testing.
+  - Includes **custom exception middleware** returning structured `ProblemDetails` responses.
+  - Each aggregate root has tailored error responses for improved client understanding.
+
 - **Cross-Cutting Features**  
-  - Event simulation via domain events (e.g., `AccessRequestApproved`)
+  - Event simulation via domain events (e.g., `MadeDecisionEvent`)
   - MediatR for domain event dispatching and handler execution
   - Bitwise operations for access control
 
@@ -79,5 +85,47 @@ This project uses a layered architecture with Domain-Driven Design (DDD) princip
 ## Database Design
 ![image](https://github.com/user-attachments/assets/a0fb5e8f-9c8b-49ff-acad-fafdf942d509)
 ![image](https://github.com/user-attachments/assets/9f255549-43a8-4f82-8385-8e20b1d1dc39)
+
+## How to Test the Project
+
+You can manually test the system using **Swagger UI** after running the app:
+
+### 1. Register Two Users
+
+Use the **register** endpoint in Swagger to create:
+- **Bob** – regular user  
+- **Alice** – future approver
+
+### 2. Promote Alice to Approver
+
+1. Login as the **default admin** using:
+   - Username: `admin`  
+   - Password: `admin`
+2. Copy the `accessToken` from the login response.
+3. Paste it into Swagger’s "Authorize" dialog as: Bearer <accessToken>
+4. Use the **Add Role** endpoint to assign the `Approver` role to **Alice**.
+
+### 3. Test Document Access Flow
+
+- **Alice (Approver)** logs in and creates a **document**.
+- **Bob (User)** logs in and requests **access** to the document (can choose Read, Edit, Delete, or any combination).
+- **Alice** logs in and views the **pending access requests**.
+- She uses the **Post Decision** endpoint to **approve or decline** the request.
+
+### 4. Observe Access Behavior
+
+- If approved, Bob can now access the document based on his requested permissions:
+- Read
+- Edit
+- Delete
+- Any valid combination (using bitwise logic)
+
+### 5. Event Confirmation
+
+- After Alice makes a decision, a `MadeDecisionEvent` is triggered internally.
+- A **message is printed to the console** confirming the event was handled.
+
+
+
 
 
